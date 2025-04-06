@@ -1,27 +1,38 @@
-import { Gallery } from "@/components/gallery"
-import { categories, getCategoryImages } from "@/lib/data"
-import { notFound } from "next/navigation"
+import { Gallery } from "@/components/gallery";
+import { categories, Category } from "@/lib/constants";
 
-export function generateStaticParams() {
-  return categories.map((category) => ({
-    category: category.slug,
-  }))
+// Define the page props to get the category parameter from the URL
+interface CategoryPageProps {
+  params: {
+    category: string;
+  };
 }
 
-export default function CategoryPage({ params }: { params: { category: string } }) {
-  const category = categories.find((c) => c.slug === params.category)
+export async function generateStaticParams() {
+  return categories.map((category: Category) => ({
+    category: category.slug,
+  }));
+}
 
-  if (!category) {
-    notFound()
+export default function CategoryPage({ params }: CategoryPageProps) {
+  const { category } = params;
+
+  // Validate if the category exists using the helper function
+  const isValidCategory = categories.some(
+    (cat: Category) => cat.slug === category
+  );
+
+  if (!isValidCategory) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <p className="text-center text-gray-500">Category not found</p>
+      </div>
+    );
   }
-
-  const images = getCategoryImages(params.category)
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">{category.name}</h1>
-      <Gallery images={images} />
+      <Gallery category={category} />
     </div>
-  )
+  );
 }
-

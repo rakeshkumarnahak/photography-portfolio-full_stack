@@ -5,6 +5,7 @@ import { API_URL } from "./config";
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
     const error = await response.json();
+    console.error("API Error:", error);
     throw new Error(error.message || "An error occurred");
   }
   return response.json();
@@ -15,6 +16,17 @@ export const photoApi = {
   // Get all photos
   getAllPhotos: async () => {
     const response = await fetch(`${API_URL}/photos`);
+    return handleResponse(response);
+  },
+
+  // Get photos by category (using query parameter)
+  getPhotosByCategory: async (category: string) => {
+    console.log(`Fetching photos for category: ${category}`);
+    const response = await fetch(
+      `${API_URL}/photos?category=${encodeURIComponent(category)}`
+    );
+    console.log(`${API_URL}/photos?category=${encodeURIComponent(category)}`);
+    console.log(response);
     return handleResponse(response);
   },
 

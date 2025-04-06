@@ -38,18 +38,17 @@ export function Gallery({ category }: GalleryProps) {
     fetchPhotos();
   }, [category]);
 
+  console.log("Catagory is " + category);
+
   const fetchPhotos = async () => {
     try {
       setLoading(true);
-      const photos = await photoApi.getAllPhotos();
 
-      // Filter by category if specified
-      const filteredPhotos = category
-        ? photos.filter((photo: Photo) => photo.category.slug === category)
-        : photos;
+      // Use getPhotosByCategory instead of getAllPhotos
+      const photos = await photoApi.getPhotosByCategory(category);
 
       // Transform photos to GalleryImage format
-      const galleryImages = filteredPhotos.map((photo: Photo) => ({
+      const galleryImages = photos.map((photo: Photo) => ({
         id: photo._id,
         src: photo.imageUrl,
         alt: photo.alt,
@@ -66,7 +65,7 @@ export function Gallery({ category }: GalleryProps) {
       console.error("Error fetching photos:", error);
       toast({
         title: "Error",
-        description: "Failed to load photos",
+        description: "Failed to load photos for this category",
         variant: "destructive",
       });
     } finally {
